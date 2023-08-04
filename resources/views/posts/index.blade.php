@@ -1,6 +1,16 @@
 <x-layout>
     <div class="pt-4">
         @unless (count($posts) == 0)
+            @foreach ($categories as $category)
+                <h1 class="mt-5"><?= $post->category ?></h1>
+                <hr class="mb-4" />
+                <h2>{{ $category->name }}</h2>
+                <ul>
+                    @foreach ($category->posts as $post)
+                        <li>{{ $post->title }}</li>
+                    @endforeach
+                </ul>
+            @endforeach
             @foreach ($posts as $post)
                 @php
                     $maxCharacters = 120;

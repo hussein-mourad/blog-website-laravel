@@ -33,6 +33,10 @@ return new class extends Migration
      */
     public function down()
     {
+        // Remove foreign key constraint from the 'posts' table
+        // Schema::table('posts', function (Blueprint $table) {
+        //     $table->dropForeign('posts_user_id_foreign');
+        // });
         Schema::dropIfExists('users');
     }
 };

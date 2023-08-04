@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Post;
 use App\Models\Comment;
 use App\Http\Requests\StoreCommentRequest;
 use App\Http\Requests\UpdateCommentRequest;
@@ -34,9 +35,15 @@ class CommentController extends Controller
      * @param  \App\Http\Requests\StoreCommentRequest  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(StoreCommentRequest $request)
+    public function store(StoreCommentRequest $request, Post $post)
     {
-        //
+        $data = $request->validate([
+            'content' => 'required',
+        ]);
+        $data['user_id'] = auth()->id();
+        $data['post_id'] = $post->id;
+        Comment::create($data);
+        return back();
     }
 
     /**
@@ -70,7 +77,12 @@ class CommentController extends Controller
      */
     public function update(UpdateCommentRequest $request, Comment $comment)
     {
-        //
+        $data = $request->validate([
+            'content' => 'required',
+        ]);
+        $comment->update($data);
+
+        return back();
     }
 
     /**
@@ -81,6 +93,7 @@ class CommentController extends Controller
      */
     public function destroy(Comment $comment)
     {
-        //
+       $comment->delete();
+       return back();
     }
 }

@@ -106,7 +106,7 @@ class PostController extends Controller
             $data['thumbnail'] = $request->file('thumbnail')->store('thumbnails', 'public');
         }
         $post->update($data);
-        return redirect('/posts/' . $post->id)->with('success', 'Post created successfully!');
+        return redirect('/posts/' . $post->id);
     }
 
     /**

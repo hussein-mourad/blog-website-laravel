@@ -1,7 +1,8 @@
 <?php
 
-use App\Http\Controllers\PostController;
+use App\Http\Controllers\CommentController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\PostController;
 use App\Http\Controllers\UserController;
 
 /*
@@ -28,6 +29,12 @@ Route::resource('posts', PostController::class)
   ->only(['create', 'store', 'edit', 'update', 'destroy'])
   ->middleware('auth');
 Route::get('/posts/{post}', [PostController::class, 'show'])->whereNumber('id');
+
+Route::post('/comments/{post}', [CommentController::class, 'store'])->middleware('auth');
+Route::resource('comments', CommentController::class)
+  ->only(['update', 'destroy'])
+  ->middleware('auth');
+// Route::get('/posts/{post}', [PostController::class, 'show'])->whereNumber('id');
 
 // User Routes
 Route::view('/login', 'users.login')->middleware('guest')->name('login');

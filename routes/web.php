@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\PostController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UserController;
 
@@ -22,11 +23,14 @@ use App\Http\Controllers\UserController;
 // update
 // destroy
 
-Route::get('/', function () {
-    return view('posts.index');
-});
+Route::get('/', [PostController::class, 'index']);
+Route::get('/posts/create', [PostController::class, 'create']);
+Route::get('/posts/{post}', [PostController::class, 'show']);
 
 
-// Auth Routes
-Route::view('/login', 'users.login');
-Route::view('/signup', 'users.signup');
+// User Routes
+Route::view('/login', 'users.login')->middleware('guest');
+Route::view('/signup', 'users.signup')->middleware('guest');
+Route::post('/users', [UserController::class, "store"]);
+Route::post('/users/auth', [UserController::class, "auth"])->middleware('guest');
+Route::post('/logout', [UserController::class, "logout"])->middleware('auth');

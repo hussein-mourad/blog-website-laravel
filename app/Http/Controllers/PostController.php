@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Post;
 use App\Http\Requests\StorePostRequest;
 use App\Http\Requests\UpdatePostRequest;
+use App\Models\Category;
 
 class PostController extends Controller
 {
@@ -15,7 +16,11 @@ class PostController extends Controller
      */
     public function index()
     {
-        //
+        // $posts = Post::latest()->filter(request(['tag', 'search']))->paginate(6);
+        $posts = Post::latest()->get();
+        return view('posts.index', [
+            'posts' => $posts
+        ]);
     }
 
     /**
@@ -25,7 +30,8 @@ class PostController extends Controller
      */
     public function create()
     {
-        //
+        $categories = Category::all();
+        return view('posts.create', ['categories' => $categories]);
     }
 
     /**
@@ -47,7 +53,7 @@ class PostController extends Controller
      */
     public function show(Post $post)
     {
-        //
+        return view('posts.show', ['post' => $post]);
     }
 
     /**

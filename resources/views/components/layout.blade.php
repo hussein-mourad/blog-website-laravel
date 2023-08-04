@@ -1,3 +1,7 @@
+@props(['container' => true])
+@php
+    $container = strtolower($container) === 'false' ? false : true;
+@endphp
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 
@@ -11,6 +15,12 @@
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700;900&display=swap" />
     <!-- MDB -->
     <link rel="stylesheet" href="{{ asset('assets/mdb5/css/mdb.min.css') }}" />
+    <style>
+        #content {
+            /* Margin to fix overlapping fixed navbar */
+            margin-top: 60px;
+        }
+    </style>
 </head>
 
 <body class="antialiased">
@@ -48,11 +58,12 @@
 
                     <div class="d-flex align-items-center">
                         @auth
-                            <a href="/logout">
-                                <button type="button" class="btn btn-primary px-3 me-2">
+                            <form action="/logout" method="post">
+                                @csrf
+                                <button type="submit" class="btn btn-primary px-3 me-2">
                                     Logout
                                 </button>
-                            </a>
+                            </form>
                         @else
                             <a href="/login">
                                 <button type="button" class="btn btn-link px-3 me-2">
@@ -72,10 +83,14 @@
             <!-- Container wrapper -->
         </nav>
     </header>
-    <main>
+    @php
+        $container;
+    @endphp
+    <main {{ $attributes->merge(['class' => $container ? 'container' : '']) }} id="content">
         {{ $slot }}
     </main>
     <!-- MDB -->
+    @vite('resources/js/app.js')
     <script type="text/javascript" src="{{ asset('assets/mdb5/js/mdb.min.js') }}"></script>
 </body>
 

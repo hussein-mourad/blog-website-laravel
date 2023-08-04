@@ -1,4 +1,9 @@
-<x-layout>
+<x-layout container="false">
+    <style>
+        #content {
+            margin-top: 0;
+        }
+    </style>
     <section class="vh-100 d-flex justify-content-center">
         <div class="container-fluid">
             <div class="row d-flex justify-content-center align-items-center h-100">
@@ -13,16 +18,20 @@
                         <div class="form-group mb-4">
                             <label class="form-label" for="emailField">Email address</label>
                             <input name="email" type="email" id="emailField" class="form-control form-control-lg"
-                                placeholder="Enter email address" />
+                                placeholder="Enter email address" value="{{ old('email') }}" />
                         </div>
+                        @error('email')
+                            <small class="text-danger">{{ $message }}</small>
+                        @enderror
 
                         <!-- Password input -->
                         <div class="form-group mb-3">
                             <label class="form-label" for="passwordField">Password</label>
                             <input name="password" id="passwordField" type="password"
-                                class="form-control form-control-lg" placeholder="Enter password" />
+                                class="form-control form-control-lg" placeholder="Enter password"
+                                value="{{ old('password') }}" />
                         </div>
-                        @error('failed')
+                        @error('password')
                             <small class="text-danger">{{ $message }}</small>
                         @enderror
 
@@ -37,4 +46,4 @@
             </div>
         </div>
     </section>
-</x-layout>
+    </x-layout>

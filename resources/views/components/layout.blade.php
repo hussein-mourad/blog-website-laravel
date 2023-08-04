@@ -51,7 +51,7 @@
                         </li>
 
                         <li class="nav-item">
-                            <a class="nav-link" href="/post/create">Add Post</a>
+                            <a class="nav-link" href="/posts/create">Add Post</a>
                         </li>
                     </ul>
                     <!-- Left links -->

@@ -41,7 +41,19 @@ class PostController extends Controller
      */
     public function store(StorePostRequest $request)
     {
-        //
+        dd($request);
+        $data = $request->validate([
+            'title' => 'required',
+            'content' => 'required',
+            'category' => 'required',
+        ]);
+
+        if ($request->hasFile('thumbnail')) {
+            $data['thumbnail'] = $request->file('thumbnail')->store('thumbnails', 'public');
+        }
+        $data['user_id'] = auth()->id();
+        Post::create($data);
+        return redirect('/posts/create')->with('success', 'Post created successfully!');
     }
 
     /**

@@ -23,10 +23,13 @@ use App\Http\Controllers\UserController;
 // update
 // destroy
 
-Route::get('/', [PostController::class, 'index']);
-Route::get('/posts/create', [PostController::class, 'create']);
-Route::get('/posts/{post}', [PostController::class, 'show']);
+Route::resource('posts', PostController::class);
 
+Route::get('/', [PostController::class, 'index']);
+Route::get('/posts/{post}', [PostController::class, 'show'])->whereNumber('id');
+
+Route::get('/posts/create', [PostController::class, 'create'])->middleware('auth');
+Route::post('/posts', [PostController::class, 'store']);
 
 // User Routes
 Route::view('/login', 'users.login')->middleware('guest');

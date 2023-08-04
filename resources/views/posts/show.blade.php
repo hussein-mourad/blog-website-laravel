@@ -34,6 +34,37 @@
 
     </section>
 
+    @auth
+        <section class="border-bottom mb-5">
+            <div class="d-flex justify-content-between mb-3">
+                <div class="d-flex align-items-center">
+                    <div class="me-3">
+
+                    </div>
+                    <div>
+                        <form>
+                            <a href="#leaveComment" class="btn btn-link text-muted ps-0">
+                                <i class="fa-xl fa-regular fa-comment me-2"></i><strong>Comment</strong>
+                            </a>
+                        </form>
+                    </div>
+                </div>
+                @if (auth()->id() == $post->user_id || auth()->user()->role == 'admin')
+                    <div class="d-flex justify-content-end">
+                        <a href="/posts/{{ $post->id }}/edit" class=" btn btn-link btn-floating text-muted" type="submit"><i
+                                class="fas fa-xl fa-pen"></i></a>
+                        <form action="/posts/{{ $post->id }}" method="post">
+                            @csrf
+                            @method('delete')
+                            <button class=" btn btn-link btn-floating text-muted" type="submit"><i
+                                    class="fas fa-xl fa-trash-can"></i></button>
+                        </form>
+                    </div>
+                @endif
+            </div>
+        </section>
+    @endauth
+
 
     <!--Section: Text-->
     <section class="mb-3">

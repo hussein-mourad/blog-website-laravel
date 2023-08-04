@@ -23,17 +23,15 @@ use App\Http\Controllers\UserController;
 // update
 // destroy
 
-Route::resource('posts', PostController::class);
-
 Route::get('/', [PostController::class, 'index']);
+Route::resource('posts', PostController::class)
+  ->only(['create', 'store', 'edit', 'update', 'destroy'])
+  ->middleware('auth');
 Route::get('/posts/{post}', [PostController::class, 'show'])->whereNumber('id');
 
-Route::get('/posts/create', [PostController::class, 'create'])->middleware('auth');
-Route::post('/posts', [PostController::class, 'store']);
-
 // User Routes
-Route::view('/login', 'users.login')->middleware('guest');
-Route::view('/signup', 'users.signup')->middleware('guest');
-Route::post('/users', [UserController::class, "store"]);
+Route::view('/login', 'users.login')->middleware('guest')->name('login');
+Route::view('/signup', 'users.signup')->middleware('guest')->name('signup');
+Route::post('/users', [UserController::class, "store"])->name('users.store');
 Route::post('/users/auth', [UserController::class, "auth"])->middleware('guest');
 Route::post('/logout', [UserController::class, "logout"])->middleware('auth');

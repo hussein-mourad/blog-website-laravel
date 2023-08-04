@@ -3,9 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Models\Post;
-use App\Http\Requests\StorePostRequest;
-use App\Http\Requests\UpdatePostRequest;
 use App\Models\Category;
+use App\Http\Requests\StorePostRequest;
+use Illuminate\Support\Facades\Storage;
+use App\Http\Requests\UpdatePostRequest;
 
 class PostController extends Controller
 {
@@ -18,7 +19,9 @@ class PostController extends Controller
     {
         // $posts = Post::latest()->filter(request(['tag', 'search']))->paginate(6);
         // $posts = Post::latest()->get();
-        $categories = Category::with('posts')->get();
+        $categories = Category::with(['posts' => function ($query) {
+            $query->orderBy('updated_at', 'desc');
+        }])->get();
         return view('posts.index', compact('categories'));
     }
 
@@ -41,11 +44,11 @@ class PostController extends Controller
      */
     public function store(StorePostRequest $request)
     {
-        dd($request);
         $data = $request->validate([
             'title' => 'required',
             'content' => 'required',
-            'category' => 'required',
+            'category_id' => 'required',
+            'thumbnail' => 'file|mimes:jpeg,png|max:2048',
         ]);
 
         if ($request->hasFile('thumbnail')) {
@@ -75,7 +78,10 @@ class PostController extends Controller
      */
     public function edit(Post $post)
     {
-        //
+        if (auth()->id() != $post->user_id)
+            return back();
+        $categories = Category::all();
+        return view('posts.edit', ['post' => $post, 'categories' => $categories]);
     }
 
     /**
@@ -87,7 +93,20 @@ class PostController extends Controller
      */
     public function update(UpdatePostRequest $request, Post $post)
     {
-        //
+        $data = $request->validate([
+            'title' => 'required',
+            'content' => 'required',
+            'category_id' => 'required',
+            'thumbnail' => 'file|mimes:jpeg,png|max:2048',
+        ]);
+
+        if ($request->hasFile('thumbnail')) {
+            if (Storage::disk('public')->exists($post->thumbnail))
+                Storage::disk('public')->delete($post->thumbnail);
+            $data['thumbnail'] = $request->file('thumbnail')->store('thumbnails', 'public');
+        }
+        $post->update($data);
+        return redirect('/posts/' . $post->id)->with('success', 'Post created successfully!');
     }
 
     /**
@@ -98,6 +117,15 @@ class PostController extends Controller
      */
     public function destroy(Post $post)
     {
-        //
+        // Make sure logged in user is owner
+        if ($post->user_id != auth()->id()) {
+            abort(403, 'Unauthorized Action');
+        }
+
+        if ($post->thumbnail && Storage::disk('public')->exists($post->thumbnail)) {
+            Storage::disk('public')->delete($post->thumbnail);
+        }
+        $post->delete();
+        return redirect('/');
     }
 }

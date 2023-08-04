@@ -61,7 +61,7 @@ class CategoryController extends Controller
         //
     }
 
-    /**
+    /*.*
      * Update the specified resource in storage.
      *
      * @param  \App\Http\Requests\UpdateCategoryRequest  $request
@@ -70,6 +70,7 @@ class CategoryController extends Controller
      */
     public function update(UpdateCategoryRequest $request, Category $category)
     {
+
         //
     }
 

@@ -16,9 +16,9 @@ return new class extends Migration
         Schema::create('posts', function (Blueprint $table) {
             $table->id();
             $table->foreignId('authorId')->constrained('users', 'id')->cascadeOnDelete();
-            $table->string('thumbnail');
+            $table->string('thumbnail')->nullable();
             $table->string('title', 255);
-            $table->lognText('body', 255);
+            $table->longText('body', 255);
             $table->timestamps();
         });
     }

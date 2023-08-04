@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\UserController;
 
 /*
 |--------------------------------------------------------------------------
@@ -13,6 +14,19 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
+// index
+// show
+// create
+// store
+// edit
+// update
+// destroy
+
 Route::get('/', function () {
-    return view('welcome');
+    return view('posts.index');
 });
+
+
+// Auth Routes
+Route::view('/login', 'users.login');
+Route::view('/signup', 'users.signup');

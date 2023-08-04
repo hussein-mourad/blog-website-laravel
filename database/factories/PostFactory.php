@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use Illuminate\Support\Str;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -17,7 +18,9 @@ class PostFactory extends Factory
     public function definition()
     {
         return [
-            //
+            'authorId' => 1,
+            'title' => fake()->sentence(),
+            'body' => fake()->paragraph(10),
         ];
     }
 }

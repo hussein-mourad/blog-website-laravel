@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Post;
 use App\Models\Reaction;
 use App\Http\Requests\StoreReactionRequest;
 use App\Http\Requests\UpdateReactionRequest;
@@ -34,9 +35,15 @@ class ReactionController extends Controller
      * @param  \App\Http\Requests\StoreReactionRequest  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(StoreReactionRequest $request)
+    public function store(StoreReactionRequest $request, Post $post)
     {
-        //
+        $data = $request->validate([
+            'type' => 'required',
+        ]);
+        $data['user_id'] = auth()->id();
+        $data['post_id'] = $post->id;
+        Reaction::create($data);
+        return back();
     }
 
     /**
@@ -70,7 +77,11 @@ class ReactionController extends Controller
      */
     public function update(UpdateReactionRequest $request, Reaction $reaction)
     {
-        //
+        $data = $request->validate([
+            'type' => 'required',
+        ]);
+        $reaction->update($data);
+        return back();
     }
 
     /**
@@ -81,6 +92,7 @@ class ReactionController extends Controller
      */
     public function destroy(Reaction $reaction)
     {
-        //
+        $reaction->delete();
+        return back();
     }
 }

@@ -68,7 +68,10 @@ class PostController extends Controller
      */
     public function show(Post $post)
     {
-        return view('posts.show', ['post' => $post]);
+        $reactionsCount = $post->reactions->groupBy('type')->map->count();
+        if (auth()->check())
+            $userReaction = $post->reactions()->where('user_id', auth()->id())->first();
+        return view('posts.show', compact('post', 'reactionsCount', 'userReaction'));
     }
 
     /**

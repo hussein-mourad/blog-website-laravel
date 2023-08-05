@@ -1,3 +1,13 @@
+@php
+    $reactionEmojis = [
+        'like' => '&#128077;',
+        'haha' => '&#128514;',
+        'love' => '&#10084;&#65039;',
+        'sad' => '&#128549',
+        'angry' => '&#128544',
+    ];
+    $reactionTypes = ['like', 'haha', 'love', 'sad', 'angry'];
+@endphp
 <x-layout>
     <style>
         .dropdown:hover>.dropdown-menu {
@@ -32,6 +42,17 @@
             </div>
         </div>
 
+        @if (count($post->reactions))
+            <div class="d-flex">
+                @foreach ($reactionsCount as $type => $count)
+                    <div class="me-1">
+                        {!! html_entity_decode($reactionEmojis[$type]) !!}
+                    </div>
+                @endforeach
+                <div class="me-1">{{ count($post->reactions) }}</div>
+            </div>
+            </div>
+        @endif
     </section>
 
     @auth
@@ -39,7 +60,42 @@
             <div class="d-flex justify-content-between mb-3">
                 <div class="d-flex align-items-center">
                     <div class="me-3">
-
+                        @unless ($userReaction)
+                            <div class="dropdown">
+                                <form action="/reactions/{{ $post->id }}" method="post">
+                                    @csrf
+                                    <input type="hidden" name="type" value="like" />
+                                    <button class="btn btn-link text-muted">
+                                        <i class="fa-xl fa-regular fa-thumbs-up me-2"></i><strong>Like</strong>
+                                    </button>
+                                </form>
+                                <div class="dropdown-menu">
+                                    <div class="btn-group">
+                                        @foreach ($reactionTypes as $reaction)
+                                            <form action="/reactions/{{ $post->id }}" method="post">
+                                                @csrf
+                                                <input type="hidden" name="type" value="{{ $reaction }}" />
+                                                <button class="btn btn-link text-muted d-flex px-3">
+                                                    <i class='me-2'>{!! html_entity_decode($reactionEmojis[$reaction]) !!}</i>{{ $reaction }}</button>
+                                            </form>
+                                        @endforeach
+                                    </div>
+                                </div>
+                            </div>
+                        @else
+                            <form action="/reactions/{{ $userReaction->id }}" method="post">
+                                @csrf
+                                @method('delete')
+                                <button class="btn btn-link" type="submit">
+                                    @if ($userReaction->type == 'like')
+                                        <i class="fa-xl fa-solid fa-thumbs-up me-2"></i>
+                                    @else
+                                        <i class="me-2">{!! html_entity_decode($reactionEmojis[$userReaction->type]) !!}</i>
+                                    @endif
+                                    <strong>{{ $userReaction->type }}</strong>
+                                </button>
+                            </form>
+                        @endunless
                     </div>
                     <div>
                         <form>
@@ -49,7 +105,7 @@
                         </form>
                     </div>
                 </div>
-                @if (auth()->id() == $post->user_id || auth()->user()->role == 'admin')
+                @if (auth()->id() == $post->user_id || auth()->user()->role === 'admin')
                     <div class="d-flex justify-content-end">
                         <a href="/posts/{{ $post->id }}/edit" class=" btn btn-link btn-floating text-muted"
                             type="submit"><i class="fas fa-xl fa-pen"></i></a>
@@ -77,8 +133,9 @@
             @foreach ($post->comments as $comment)
                 @unless ($comment->comment_id)
                     <div class="d-flex flex-start mb-3">
-                        <img class="rounded-circle shadow-1-strong me-3" src="{{ asset('assets/imgs/default-avatar.jpg') }}"
-                            alt="avatar" width="65" height="65" />
+                        <img class="rounded-circle shadow-1-strong me-3"
+                            src="{{ asset('assets/imgs/default-avatar.jpg') }}" alt="avatar" width="65"
+                            height="65" />
                         <div class="flex-grow-1 flex-shrink-1">
                             <div class="">
                                 <div class="d-flex justify-content-between align-items-center">
@@ -91,12 +148,14 @@
                                             onclick="showReplyForm({{ 'replyForm' . $comment->id }})"><i
                                                 class="fas fa-reply fa-xs me-2"></i><span class="small">
                                                 reply</span></button>
-                                        <form action="/comments/{{ $comment->id }}" method="post">
-                                            @csrf
-                                            @method('delete')
-                                            <button class=" btn btn-link btn-floating text-muted" type="submit"><i
-                                                    class="fas fa-xl fa-trash-can"></i></button>
-                                        </form>
+                                        @if (auth()->id() == $comment->user_id || auth()->user()->role === 'admin')
+                                            <form action="/comments/{{ $comment->id }}" method="post">
+                                                @csrf
+                                                @method('delete')
+                                                <button class=" btn btn-link btn-floating text-muted" type="submit"><i
+                                                        class="fas fa-xl fa-trash-can"></i></button>
+                                            </form>
+                                        @endif
                                     </div>
                                 </div>
                                 <p class="small mb-0">
@@ -118,12 +177,14 @@
                                                         class="small ms-1">
                                                         {{ $reply->updated_at->diffForHumans() }}</span>
                                                 </p>
-                                                <form action="/comments/{{ $reply->id }}" method="post">
-                                                    @csrf
-                                                    @method('delete')
-                                                    <button class=" btn btn-link btn-floating text-muted" type="submit"><i
-                                                            class="fas fa-xl fa-trash-can"></i></button>
-                                                </form>
+                                                @if (auth()->id() == $reply->user_id || auth()->user()->role === 'admin')
+                                                    <form action="/comments/{{ $reply->id }}" method="post">
+                                                        @csrf
+                                                        @method('delete')
+                                                        <button class=" btn btn-link btn-floating text-muted"
+                                                            type="submit"><i class="fas fa-xl fa-trash-can"></i></button>
+                                                    </form>
+                                                @endif
                                             </div>
                                             <p class="small mb-0">
                                                 {{ $reply->content }}
@@ -136,11 +197,13 @@
                     </div>
                     @auth
                         <div class="mt-4 mb-5">
-                            <form action="/comments/{{ $post->id }}" method='post'>
+                            <form action="/comments/{{ $post->id }}" method='post'
+                                id="{{ 'replyForm' . $comment->id }}" style="display:none;">
                                 @csrf
                                 <input type="hidden" name="comment_id" value="{{ $comment->id }}">
                                 <div class="form-outline mb-3">
-                                    <textarea class="form-control" name="content" id="reply" rows="2" placeholder="Enter your reply" required></textarea>
+                                    <textarea class="form-control" name="content" id="reply" rows="2" placeholder="Enter your reply"
+                                        required></textarea>
                                     <label for="reply" class="form-label">Leave a Reply</label>
                                 </div>
                                 <button type="submit" class="btn btn-primary">Reply</button>
@@ -168,4 +231,13 @@
             </form>
         </section>
     @endauth
+    <script>
+        function showReplyForm(form) {
+            if (form.style.display === "none") {
+                form.style.display = "block";
+            } else {
+                form.style.display = "none";
+            }
+        }
+    </script>
 </x-layout>

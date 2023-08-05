@@ -38,6 +38,7 @@ class CommentController extends Controller
     public function store(StoreCommentRequest $request, Post $post)
     {
         $data = $request->validate([
+            'comment_id' => '',
             'content' => 'required',
         ]);
         $data['user_id'] = auth()->id();
@@ -93,7 +94,7 @@ class CommentController extends Controller
      */
     public function destroy(Comment $comment)
     {
-       $comment->delete();
-       return back();
+        $comment->delete();
+        return back();
     }
 }

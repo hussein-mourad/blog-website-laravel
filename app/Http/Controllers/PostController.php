@@ -7,6 +7,7 @@ use App\Models\Category;
 use App\Http\Requests\StorePostRequest;
 use Illuminate\Support\Facades\Storage;
 use App\Http\Requests\UpdatePostRequest;
+use App\Models\Comment;
 
 class PostController extends Controller
 {
